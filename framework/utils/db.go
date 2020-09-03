@@ -46,8 +46,9 @@ func ConnectDB(env string) *gorm.DB {
 	}
 
 	if os.Getenv("AutoMigrateDb") == "true" {
-		db.AutoMigrate(&domain.User{}, &domain.Author{}, &domain.Challenge{}, &domain.ChallengeFile{})
-		db.Model(domain.ChallengeFile{}).AddForeignKey("challenge_id", "challenges (id)", "CASCADE", "CASCADE")
+		db.AutoMigrate(&domain.User{})
+		// db.AutoMigrate(&domain.User{}, &domain.Author{}, &domain.Challenge{}, &domain.ChallengeFile{})
+		// db.Model(domain.ChallengeFile{}).AddForeignKey("challenge_id", "challenges (id)", "CASCADE", "CASCADE")
 	}
 
 	//defer db.Close()

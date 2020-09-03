@@ -11,7 +11,7 @@ import (
 
 func main() {
 
-	db := utils.ConnectDB()
+	db := utils.ConnectDB("dev")
 
 	user := domain.User{
 		Name:     "Rodrigo",
