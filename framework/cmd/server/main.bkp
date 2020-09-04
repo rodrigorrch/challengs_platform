@@ -1,6 +1,8 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"log"
 	"net"
 	"os"
@@ -14,6 +16,7 @@ import (
 	"github.com/rodrigorrch/challengs_platform/framework/servers"
 	"github.com/rodrigorrch/challengs_platform/framework/utils"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 var db *gorm.DB
@@ -30,27 +33,27 @@ func main() {
 
 	db = utils.ConnectDB(os.Getenv("env"))
 
-	// port := flag.Int("port", 0, "the server port")
-	// flag.Parse()
-	// log.Printf("start server on port %d", *port)
+	port := flag.Int("port", 0, "the server port")
+	flag.Parse()
+	log.Printf("start server on port %d", *port)
 
 	userServer := setUpUserServer()
-	// challengeServer := setUpChallengeServer()
+	challengeServer := setUpChallengeServer()
 
 	grpcServer := grpc.NewServer()
 	pb.RegisterUserServiceServer(grpcServer, userServer)
-	// pb.RegisterChallengeServiceServer(grpcServer, challengeServer)
-	// reflection.Register(grpcServer)
+	pb.RegisterChallengeServiceServer(grpcServer, challengeServer)
+	reflection.Register(grpcServer)
 
-	// address := fmt.Sprintf("0.0.0.0:%d", *port)
-	listener, err := net.Listen("tcp", "0.0.0.0:50051") // address can changed to "0.0.0.0:50051"
+	address := fmt.Sprintf("0.0.0.0:%d", *port)
+	listener, err := net.Listen("tcp", address)
 	if err != nil {
-		log.Fatalf("cannot start server: %w", err)
+		log.Fatal("cannot start server: ", err)
 	}
 
 	err = grpcServer.Serve(listener)
 	if err != nil {
-		log.Fatalf("cannot start server: %v", err)
+		log.Fatal("cannot start server: ", err)
 	}
 }
 
@@ -61,9 +64,9 @@ func setUpUserServer() *servers.UserServer {
 	return userServer
 }
 
-// func setUpChallengeServer() *servers.ChallengeServer {
-// 	challengeServer := servers.NewChallengeServer()
-// 	challengeRepository := repositories.ChallengeRepositoryDb{Db: db}
-// 	challengeServer.ChallengeUseCase = usecases.ChallengeUseCase{ChallengeRepository: challengeRepository}
-// 	return challengeServer
-// }
+func setUpChallengeServer() *servers.ChallengeServer {
+	challengeServer := servers.NewChallengeServer()
+	challengeRepository := repositories.ChallengeRepositoryDb{Db: db}
+	challengeServer.ChallengeUseCase = usecases.ChallengeUseCase{ChallengeRepository: challengeRepository}
+	return challengeServer
+}

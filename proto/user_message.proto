@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+// pb = protocol buffer
+option go_package = "pb";
+
+message UserRequest {
+    string name = 1;
+    string email = 2;
+    string password = 3;
+}
+
+message UserResponse {
+    string token = 1;
+}
+
+message UserAuthRequest {
+    string email = 1;
+    string password = 2;
+}
+
+service UserService {
+    // CreateUser e Auth é criado automaticamente pela "geração de codigo"
+    // Precisa instalar o protoc - https://itectec.com/ubuntu/ubuntu-how-to-install-protoc-on-ubuntu-16-04/
+    // Rodar: protoc --proto_path=proto proto/*.proto --go_out=plugins=grpc:framework/pb
+
+    // alternative
+    // go get -u google.golang.org/grpc
+    // go get -u github.com/golang/protobuf/protoc-gen-go
+    // export PATH=$PATH:$GOPATH/bin
+    rpc CreateUser (UserRequest) returns (UserResponse) {};
+    rpc Auth (UserAuthRequest) returns (UserResponse) {};
+}
